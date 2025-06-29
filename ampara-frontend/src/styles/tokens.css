@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== PALETA DE COLORES CORPORATIVOS ========== */
+:root {
+  --color-primary: #012B75;
+  --color-secondary: #3F5A9E;
+  --color-accent: #F37040;
+  --color-light: #F5F5F5;
+  --color-dark: #1a1a1a;
+}
+
+/* ========== TIPOGRAFÍA ========== */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-light);
+  color: var(--color-dark);
+  margin: 0;
+}
+
+/* ========== BOTONES ========== */
+.btn {
+  @apply px-4 py-2 rounded text-white font-medium;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+}
+.btn-primary:hover {
+  background-color: #d25d30;
+}
+
+/* ========== HEADINGS ========== */
+.heading-xl {
+  @apply text-3xl font-bold text-primary;
+}
+
+.heading-md {
+  @apply text-xl font-semibold text-primary;
+}
