@@ -1,11 +1,12 @@
 // src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/LoginPages';
-import DashboardAdmin from './pages/DashboardAdmin';
-import Abogados from './pages/Abogados';
-import CasoAdminDetalle from './pages/CasoAdminDetalle';
-import DashboardAbogado from './pages/DashboardAbogado';
-import CasoDetalle from './pages/CasoDetalle';
+import Login from './pages/LoginPages.jsx';
+import DashboardAdmin from './pages/DashboardAdmin.jsx';
+import Abogados from './pages/Abogados.jsx';
+import CasoAdminDetalle from './pages/CasoAdminDetalle.jsx';
+import DashboardAbogado from './pages/DashboardAbogado.jsx';
+import CasoDetalle from './pages/CasoDetalle.jsx';
+import AsignarCaso from './pages/AsignarCaso.jsx';
 
 export default function App() {
   const usuario = JSON.parse(localStorage.getItem('usuario'));
@@ -34,6 +35,11 @@ export default function App() {
         path="/admin/casos/:id"
         element={<RutaProtegida rol="admin"><CasoAdminDetalle /></RutaProtegida>}
       />
+      <Route
+        path="/asignar"
+        element={usuario?.rol === 'ADMIN' ? <AsignarCaso /> : <Navigate to="/dashboard" />}
+      />
+
 
       {/* Abogado */}
       <Route
