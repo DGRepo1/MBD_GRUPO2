@@ -13,7 +13,7 @@ export default function App() {
 
   const RutaProtegida = ({ children, rol }) => {
     if (!usuario) return <Navigate to="/" />;
-    if (rol && usuario.rol !== rol) return <Navigate to="/" />;
+    if (rol && usuario.rol?.toLowerCase() !== rol) return <Navigate to="/" />;
     return children;
   };
 
@@ -37,7 +37,7 @@ export default function App() {
       />
       <Route
         path="/asignar"
-        element={usuario?.rol === 'ADMIN' ? <AsignarCaso /> : <Navigate to="/dashboard" />}
+        element={usuario?.rol === 'admin' ? <AsignarCaso /> : <Navigate to="/dashboard" />}
       />
 
 

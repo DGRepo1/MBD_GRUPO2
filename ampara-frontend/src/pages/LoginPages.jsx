@@ -22,8 +22,9 @@ export default function LoginPage() {
       if (!response.ok) throw new Error('Credenciales incorrectas');
 
       const data = await response.json();
-
-      // Asegurar que rol sea 'admin' o 'abogado' en minúsculas
+      if (!data.rol) {
+         throw new Error(data.message || 'Respuesta inválida del servidor');
+      }
       const rol = data.rol.toLowerCase();
       localStorage.setItem('usuario', JSON.stringify({ ...data, rol }));
 
