@@ -29,7 +29,7 @@ export default function AsignarCaso() {
     e.preventDefault();
     setMensaje('');
 
-    const res = await fetch('http://localhost:3000/api/asignaciones', {
+      const res = await fetch('http://localhost:3000/api/admin/asignar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ idCasoLegal: idCaso, idAbogado }),
@@ -60,7 +60,7 @@ export default function AsignarCaso() {
           >
             <option value="">Seleccione un caso</option>
             {casos.map((c) => (
-              <option key={c.idCaso} value={c.idCaso}>{c.NombreCaso}</option>
+              <option key={c.idCaso} value={c.idCaso}>{c.nombreCaso}</option>
             ))}
           </select>
         </div>

@@ -42,6 +42,8 @@ CREATE TABLE CasoLegal (
     FOREIGN KEY (IdCliente) REFERENCES Cliente(IdCliente)
 );
 
+CREATE SEQUENCE SEQ_CASOLEGAL START WITH 1 INCREMENT BY 1;
+
 -- Asignación de casos
 CREATE TABLE AsignacionCaso (
     IdAsignacionCaso NUMBER PRIMARY KEY,
@@ -85,6 +87,23 @@ VALUES (2, 'jsuarez@ampara.pe', 'Julio Suárez', 'julio123', 'ABOGADO');
 INSERT INTO Usuario (idUsuario, Correo, Nombre, Contrasena, Rol)
 VALUES (3, 'mmarquez@ampara.pe', 'María Márquez', 'maria123', 'ABOGADO');
 
+-- Inserts en tabla Usuario (para abogados nuevos)
+INSERT INTO Usuario (idUsuario, Correo, Nombre, Contrasena, Rol)
+VALUES (4, 'ana.perez@ampara.com', 'Ana Pérez', '1234', 'ABOGADO');
+
+INSERT INTO Usuario (idUsuario, Correo, Nombre, Contrasena, Rol)
+VALUES (5, 'carlos.gomez@ampara.com', 'Carlos Gómez', '1234', 'ABOGADO');
+
+INSERT INTO Usuario (idUsuario, Correo, Nombre, Contrasena, Rol)
+VALUES (6, 'lucia.torres@ampara.com', 'Lucía Torres', '1234', 'ABOGADO');
+
+INSERT INTO Usuario (idUsuario, Correo, Nombre, Contrasena, Rol)
+VALUES (7, 'jose.ramirez@ampara.com', 'José Ramírez', '1234', 'ABOGADO');
+
+INSERT INTO Usuario (idUsuario, Correo, Nombre, Contrasena, Rol)
+VALUES (8, 'veronica.diaz@ampara.com', 'Verónica Díaz', '1234', 'ABOGADO');
+
+
 --Inserts Abogado--
 INSERT INTO Abogado (idAbogado, idUsuario, Especialidad)
 VALUES (1, 2, 'Regulación Telecomunicaciones');
@@ -92,12 +111,48 @@ VALUES (1, 2, 'Regulación Telecomunicaciones');
 INSERT INTO Abogado (idAbogado, idUsuario, Especialidad)
 VALUES (2, 3, 'Contrataciones con el Estado');
 
+-- Inserts en tabla Abogado (asociados a los usuarios anteriores)
+INSERT INTO Abogado (idAbogado, idUsuario, Especialidad)
+VALUES (3, 4, 'Solución de controversias');
+
+INSERT INTO Abogado (idAbogado, idUsuario, Especialidad)
+VALUES (4, 5, 'Propiedad Intelectual');
+
+INSERT INTO Abogado (idAbogado, idUsuario, Especialidad)
+VALUES (5, 6, 'Derecho Corporativo');
+
+INSERT INTO Abogado (idAbogado, idUsuario, Especialidad)
+VALUES (6, 7, 'Protección de Datos Personales');
+
+INSERT INTO Abogado (idAbogado, idUsuario, Especialidad)
+VALUES (7, 8, 'Regulación de Competencia');
+
+
+
 --Insert Cliente--
 INSERT INTO Cliente (IdCliente, NombreCliente, CorreoCliente)
 VALUES (1, 'RedTel S.A.C.', 'contacto@redtel.com');
 
 INSERT INTO Cliente (IdCliente, NombreCliente, CorreoCliente)
 VALUES (2, 'ComNet Perú EIRL', 'soporte@comnet.pe');
+
+
+-- Inserts adicionales para Cliente
+INSERT INTO Cliente (IdCliente, NombreCliente, CorreoCliente)
+VALUES (3, 'Andes Comunicaciones S.R.L.', 'info@andescomunicaciones.pe');
+
+INSERT INTO Cliente (IdCliente, NombreCliente, CorreoCliente)
+VALUES (4, 'TeleAndina S.A.', 'servicios@teleandina.com');
+
+INSERT INTO Cliente (IdCliente, NombreCliente, CorreoCliente)
+VALUES (5, 'InnovaTel S.A.C.', 'atencion@innovatel.pe');
+
+INSERT INTO Cliente (IdCliente, NombreCliente, CorreoCliente)
+VALUES (6, 'ConectaRed Perú', 'contacto@conectared.pe');
+
+INSERT INTO Cliente (IdCliente, NombreCliente, CorreoCliente)
+VALUES (7, 'NetGlobal Solutions', 'consultas@netglobal.pe');
+
 
 --Insert Documento--
 INSERT INTO Documento (idDocumento, NombreDocumento, TipoDocumento, FechaDocumento)
@@ -152,19 +207,21 @@ CREATE SEQUENCE SEQ_ASIGNACIONCASO START WITH 1 INCREMENT BY 1;
 -- ========================
 -- LOGIN DE USUARIO
 -- ========================
-CREATE OR REPLACE FUNCTION SP_LOGIN_USER (
+CREATE OR REPLACE PROCEDURE SP_LOGIN_USER (
     p_correo IN VARCHAR2,
-    p_contrasena IN VARCHAR2
-) RETURN SYS_REFCURSOR IS
-    v_cursor SYS_REFCURSOR;
+    p_contrasena IN VARCHAR2,
+    p_cursor OUT SYS_REFCURSOR
+)
+AS
 BEGIN
-    OPEN v_cursor FOR
+    OPEN p_cursor FOR
         SELECT idUsuario, Nombre, Rol
         FROM Usuario
-        WHERE Correo = p_correo AND Contrasena = p_contrasena;
-    RETURN v_cursor;
-END;
+        WHERE LOWER(TRIM(Correo)) = LOWER(TRIM(p_correo))
+          AND TRIM(Contrasena) = TRIM(p_contrasena);
+END SP_LOGIN_USER;
 /
+
 
 -- ========================
 -- LISTAR CASOS POR ABOGADO
@@ -193,11 +250,13 @@ RETURN SYS_REFCURSOR IS
     v_cursor SYS_REFCURSOR;
 BEGIN
     OPEN v_cursor FOR
-        SELECT idCaso, NombreCaso, FechaRegistro
-        FROM CasoLegal;
+        SELECT c.idCaso, c.NombreCaso, c.FechaRegistro, cl.NombreCliente
+        FROM CasoLegal c
+        JOIN Cliente cl ON c.IdCliente = cl.IdCliente;
     RETURN v_cursor;
 END;
 /
+
 
 -- ========================
 -- LISTAR ABOGADOS (ADMIN)
@@ -300,6 +359,7 @@ BEGIN
     RETURN v_cursor;
 END;
 /
+
 
 -- ========================
 -- ELIMINAR ASIGNACIÓN

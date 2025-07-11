@@ -37,18 +37,20 @@ export default function App() {
       />
       <Route
         path="/asignar"
-        element={usuario?.rol === 'admin' ? <AsignarCaso /> : <Navigate to="/dashboard" />}
+        element={usuario?.rol === 'admin' ? <AsignarCaso /> : <Navigate to="/" />}
       />
+
 
 
       {/* Abogado */}
       <Route
-        path="/abogado/dashboard"
-        element={<RutaProtegida rol="abogado"><DashboardAbogado /></RutaProtegida>}
-      />
+      path="/abogado/dashboard"
+      element={<DashboardAbogado />}
+    />
+
       <Route
         path="/abogado/casos/:id"
-        element={<RutaProtegida rol="abogado"><CasoDetalle /></RutaProtegida>}
+        element={<CasoDetalle />}
       />
     </Routes>
   );

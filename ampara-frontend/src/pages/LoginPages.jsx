@@ -18,21 +18,27 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo, contrasena }),
       });
-
-      if (!response.ok) throw new Error('Credenciales incorrectas');
-
       const data = await response.json();
+      console.log("🟡 Datos recibidos del backend:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error de autenticación');
+      }
+
       if (!data.rol) {
-         throw new Error(data.message || 'Respuesta inválida del servidor');
+         throw new Error('Faltan datos del usuario en la respuesta');
       }
       const rol = data.rol.toLowerCase();
       localStorage.setItem('usuario', JSON.stringify({ ...data, rol }));
 
       // Redirigir según el rol
-      if (rol === 'admin') navigate('/admin/dashboard');
-      else if (rol === 'abogado') navigate('/abogado/dashboard');
-      else throw new Error('Rol no reconocido');
-
+      if (rol === 'admin') {
+        navigate('/admin/dashboard', { replace: true });
+      } else if (rol === 'abogado') {
+        navigate('/abogado/dashboard', { replace: true });
+      } else {
+        throw new Error('Rol no reconocido');
+      }
     } catch (err) {
       setError(err.message);
     }
