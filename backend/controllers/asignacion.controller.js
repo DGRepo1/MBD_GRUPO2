@@ -15,32 +15,58 @@ async function asignarCaso(req, res) {
       }
     );
     await conn.close();
+    
     res.json({ mensaje: 'Caso asignado correctamente' });
+
   } catch (err) {
-    console.error(err);
-    res.status(400).json({ error: err.message });
+    console.error("❌ Error al asignar caso:", err);
+
+    if (err.message.includes('ORA-20001')) {
+      return res.status(400).json({
+        error: 'Este caso ya fue asignado a este abogado.'
+      });
+    }
+
+    res.status(500).json({
+      error: 'Error inesperado al asignar el caso'
+    });
   }
 }
+
 
 async function listarAsignaciones(req, res) {
   try {
     const conn = await connect();
     const result = await conn.execute(
-      `BEGIN :cursor := SP_LISTAR_ASIGNACIONES; END;`,
+      `BEGIN :cursor := SP_LISTAR_ASIGNACIONES(); END;`,
       {
-        cursor: { type: require('oracledb').CURSOR, dir: require('oracledb').BIND_OUT }
+        cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR }
       }
     );
-    const rs = result.outBinds.cursor;
-    const rows = await rs.getRows();
-    await rs.close();
+
+    const cursor = result.outBinds.cursor;
+    const rows = await cursor.getRows();
+    await cursor.close();
     await conn.close();
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al listar asignaciones' });
+
+    const asignaciones = rows.map(row => ({
+      idAsignacion: row[0],
+      fecha: row[1],
+      cliente: row[2],
+      caso: row[3],
+      especialidad: row[4],
+      abogado: row[5]
+    }));
+
+    res.json(asignaciones);
+
+  } catch (error) {
+    console.error("❌ Error en listarAsignaciones:", error);
+    res.status(500).json({ message: 'Error al listar asignaciones' });
   }
 }
+
+
 
 async function eliminarAsignacion(req, res) {
   const { id } = req.params;

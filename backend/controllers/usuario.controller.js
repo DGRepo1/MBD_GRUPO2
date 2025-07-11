@@ -8,7 +8,7 @@ async function loginUsuario(req, res) {
   try {
     const conn = await connect();
     const result = await conn.execute(
-      `BEGIN :cursor := SP_LOGIN_USER(:correo, :contrasena); END;`,
+      `BEGIN SP_LOGIN_USER(:correo, :contrasena, :cursor); END;`,
       {
         correo,
         contrasena,
@@ -21,16 +21,13 @@ async function loginUsuario(req, res) {
     await resultSet.close();
     await conn.close();
 
-    if (rows.length === 0) {
+    if (!rows || rows.length === 0) {
       return res.status(401).json({ message: 'Credenciales incorrectas' });
     }
 
-    const [user] = rows;
-    res.json({
-      id: user.IDUSUARIO,
-      nombre: user.NOMBRE,
-      rol: user.ROL
-    });
+    const [idUsuario, nombre, rol] = rows[0];
+    console.log("🧾 Usuario desde la base:", rows[0]); // ✅ corregido
+    res.json({ id: idUsuario, nombre, rol });
 
   } catch (error) {
     console.error(error);
